@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Как ты?</title>
+    <meta name="theme-color" content="#0b0f17">
+    
+    <!-- Настройки для запуска как приложение (PWA) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Как ты?">
+
+    <!-- Иконка приложения (Тёмный фон + неоновая молния ⚡) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%230b0f17'/><text x='50%' y='62%' dominant-baseline='middle' text-anchor='middle' font-size='55'>⚡</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%230b0f17'/><text x='50%' y='62%' dominant-baseline='middle' text-anchor='middle' font-size='55'>⚡</text></svg>">
+
+    <!-- Встроенный манифест приложения -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Как ты?","short_name":"Как ты?","start_url":".","display":"standalone","background_color":"#0b0f17","theme_color":"#0b0f17","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2228%22 fill=%22%230b0f17%22/><text x=%2250%25%22 y=%2262%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2255%22>⚡</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #0b0f17;
+            --card-bg: rgba(22, 29, 43, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-primary: #a3e635; /* Неоновый салатовый */
+            --accent-glow: rgba(163, 230, 53, 0.25);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-main);
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            padding: env(safe-area-inset-top) 12px 12px 12px; 
+        }
+
+        .app-container { width: 100%; max-width: 420px; margin: 0 auto; padding-top: 10px; }
+        
+        .card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(12px);
+            border-radius: 24px; 
+            padding: 24px 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+            border: 1px solid var(--border-color); 
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 16px; border: 1px solid var(--border-color); }
+        .tab { flex: 1; padding: 10px 4px; text-align: center; font-size: 11px; font-weight: 600; color: var(--text-sub); cursor: pointer; border-radius: 12px; transition: all 0.2s; border: none; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab span { font-size: 18px; }
+        .tab.active { background: var(--accent-primary); color: #000; font-weight: 700; box-shadow: 0 0 15px var(--accent-glow); }
+
+        .date-badge { font-size: 12px; color: var(--accent-primary); margin-bottom: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+        h1 { font-size: 24px; margin-bottom: 16px; color: var(--text-main); font-weight: 700; letter-spacing: -0.5px; }
+        h2 { font-size: 20px; margin-bottom: 16px; color: var(--text-main); font-weight: 700; }
+        .subhead { color: var(--text-sub); font-size: 14px; margin-bottom: 20px; line-height: 1.4; }
+
+        .mood-picker { display: flex; gap: 8px; justify-content: space-between; margin: 12px 0 18px; }
+        .mood-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 0; font-size: 28px; flex: 1; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; }
+        .mood-btn.selected { border-color: var(--accent-primary); background: rgba(163, 230, 53, 0.1); box-shadow: 0 0 12px var(--accent-glow); transform: translateY(-2px); }
+
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--accent-primary); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-telegram { background: #229ED9; color: white; text-decoration: none; font-weight: 600; border-radius: 12px; padding: 10px 14px; display: inline-flex; justify-content: center; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
+
+        .context-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 16px 0; }
+        .context-card { background: rgba(255,255,255,0.02); padding: 16px; border-radius: 16px; font-size: 14px; font-weight: 600; border: 1px solid var(--border-color); cursor: pointer; color: var(--text-main); transition: all 0.2s; }
+        .context-card:hover { border-color: var(--accent-primary); background: rgba(255,255,255,0.05); }
+
+        .coping-card { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; margin: 16px 0; border: 1px solid var(--border-color); }
+        .coping-section { margin-bottom: 16px; }
+        .coping-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-primary); font-weight: 700; margin-bottom: 6px; }
+        .coping-content { font-size: 15px; line-height: 1.5; color: #e2e8f0; }
+
+        .test-question { font-size: 17px; font-weight: 600; margin-bottom: 20px; line-height: 1.4; color: var(--text-main); }
+        .test-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+        .test-option { background: rgba(255,255,255,0.02); padding: 16px; border-radius: 14px; font-size: 15px; cursor: pointer; border: 1px solid var(--border-color); color: var(--text-sub); transition: all 0.2s; }
+        .test-option.selected { background: rgba(163, 230, 53, 0.1); border-color: var(--accent-primary); color: var(--text-main); font-weight: 600; }
+
+        .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 16px 0 24px; }
+        .progress-fill { height: 100%; background: var(--accent-primary); border-radius: 10px; width: 0%; transition: width 0.3s; }
+        
+        .back-link { color: var(--text-sub); font-size: 14px; font-weight: 600; display: inline-block; margin-bottom: 16px; cursor: pointer; }
+        .breath-circle { width: 120px; height: 120px; background: rgba(163, 230, 53, 0.05); border: 2px solid var(--accent-primary); border-radius: 50%; margin: 24px auto; animation: breatheAnimation 16s infinite ease-in-out; display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-weight: 700; box-shadow: 0 0 30px var(--accent-glow); }
+        @keyframes breatheAnimation { 0%, 25%, 100% { transform: scale(1); } 50%, 75% { transform: scale(1.3); } }
+    </style>
+</head>
+<body>
+<div class="app-container"><div class="card" id="app">Загрузка...</div></div>
+
+<script>
+const STORAGE = {moodLogs:'kpt_social_mood', testResults:'kpt_social_test', journal:'kpt_social_journal'};
+const MOODS = ['⚡','🫠','😐','🙂','🔥'];
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+function safeGet(key) {
+    try { 
+        const data = localStorage.getItem(key); 
+        if (!data) return [];
+        let parsed = JSON.parse(data);
+        
+        // Авто-очистка для записей состояния старше 7 дней
+        if (key === STORAGE.moodLogs && Array.isArray(parsed)) {
+            const now = Date.now();
+            parsed = parsed.filter(item => !item.timestamp || (now - item.timestamp <= SEVEN_DAYS_MS));
+        }
+        return parsed; 
+    } 
+    catch (e) { return []; }
+}
+
+let ml = safeGet(STORAGE.moodLogs);
+let tr = safeGet(STORAGE.testResults);
+let jn = safeGet(STORAGE.journal);
+let cm = '😐', ct = 'main', cq = 0, an = [];
+
+// Укажи свой логин в Telegram без символа @
+const TELEGRAM_USERNAME = 'Snixtwix';
+
+// Шпаргалки под социальную тревожность
+const QC = [
+    {id:'call_fear', title:'📞 Страх сделать звонок / заказать кофе', context:'Нужно заговорить с незнакомым человеком', thought:'«Я запутаюсь, ляпну глупость и покажусь странным»', rational:'Каждый день бариста и операторы слышат сотни заминок. Никто не будет запоминать мою паузу.', action:'Сделай вдох, опусти плечи и скажи первую фразу прямо на выдохе.'},
+    {id:'rejection', title:'💔 Страх прочитать "Нет" или молчание', context:'Написал первому / предложил встречу', thought:'«Он/она не отвечает, потому что со мной скучно»', rational:'У человека может быть завал на работе или свои проблемы. Чтение мыслей — ошибка.', action:'Убери телефон экраном вниз на 30 минут. Переключи фокус на фильм или прогулку.'},
+    {id:'spotlight', title:'👀 Кажется, что все на меня смотрят', context:'Зашел в новое место или компанию', thought:'«Все оценивают мой вид, позу и движения»', rational:'Эффект прожектора: каждый человек в комнате на 90% занят мыслями о самом себе.', action:'Найди в комнате 3 предмета синего цвета. Сними фокус с себя на окружение.'}
+];
+
+const MC = [
+    {id:'box_breath', title:'📦 Квадратное дыхание перед контактом', context:'Снижение пульса перед быстрым разговором', action:'Вдох (4с) — Задержка (4с) — Выдох (4с) — Задержка (4с). Повтори 3 раза.', type:'timer'},
+    {id:'grounding', title:'🌍 Техника «5-4-3-2-1»', context:'Когда паника перед выходом в общество', action:'Назови про себя: 5 предметов вокруг, 4 звука, 3 ощущения в теле, 2 запаха, 1 вкус.', type:'text'},
+    {id:'shoulders', title:'🧘 Сброс зажима с челюсти и плеч', context:'Телесный зажим при тревоге', action:'Резко подними плечи к ушам на 3 секунды, а затем с выдохом сбрось их вниз. Расслабь челюсть.', type:'text'}
+];
+
+// Тест социальной тревожности
+const TQ = [
+    {text:"Бывает ли у вас ощущение, что перед простым звонком или сообщением нужно морально готовиться?", scale:"social", options:["Редко / Никогда","Иногда","Часто","Постоянно"]},
+    {text:"Насколько комфортно вам первым инициировать диалог с незнакомым человеком?", scale:"social", options:["Легко","Немного неловко","Трудно","Очень страшно"]},
+    {text:"Долго ли вы прокручиваете в голове прошлые разговоры, выискивая свои ошибки?", scale:"anxiety", options:["Нет","Бывает иногда","Часто анализирую","Прокручиваю днями"]},
+    {text:"Возникает ли у вас мысли «я навязываюсь», если пишете кому-то первыми?", scale:"social", options:["Нет","Редко","Почти всегда","Всегда"]},
+    {text:"Проще ли вам отказаться от встречи/события, чем справляться с тревогой перед ней?", scale:"anxiety", options:["Нет","Иногда","Часто","Постоянно"]}
+];
+
+function svM(){try{localStorage.setItem(STORAGE.moodLogs,JSON.stringify(ml))}catch(e){}}
+function svT(){try{localStorage.setItem(STORAGE.testResults,JSON.stringify(tr))}catch(e){}}
+
+window.switchTab=(t)=>{ct=t;if(t==='test'){cq=0;an=[]}ra()};
+
+function renderTabs(active){
+    const nav=[{id:'main',icon:'⚡',label:'Состояние'},{id:'cards',icon:'📚',label:'Шпаргалки'},{id:'mindful',icon:'🧘',label:'Покой'},{id:'test',icon:'📋',label:'Тест'}];
+    let html='<div class="tabs">';
+    nav.forEach(t=>{html+=`<button class="tab ${active===t.id?'active':''}" onclick="switchTab('${t.id}')"><span>${t.icon}</span>${t.label}</button>`;});
+    return html+'</div>';
+}
+
+function ra(){
+    const app = document.getElementById('app');
+    if(ct==='main')rms();
+    else if(ct==='cards')rcl();
+    else if(ct==='mindful')rmindful();
+    else if(ct==='test')rts();
+}
+
+function rms(){
+    let mb='';MOODS.forEach(m=>mb+=`<div class="mood-btn ${cm===m?'selected':''}" onclick="setMood('${m}')">${m}</div>`);
+    
+    // Формируем список отметок за последние 7 дней (самые свежие сверху)
+    let historyHtml = '';
+    if (ml.length > 0) {
+        const recent = ml.slice().reverse();
+        let items = recent.map(item => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(255,255,255,0.02); border-radius:12px; margin-bottom:6px; border:1px solid var(--border-color);">
+                <span style="font-size:13px; color:var(--text-sub);">${item.date}</span>
+                <span style="font-size:20px;">${item.mood}</span>
+            </div>
+        `).join('');
+        historyHtml = `
+            <div style="margin-top:24px;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--accent-primary); margin-bottom:10px;">Динамика за 7 дней</div>
+                ${items}
+            </div>
+        `;
+    }
+
+    document.getElementById('app').innerHTML=`${renderTabs('main')}
+    <div class="date-badge">Будь в потоке</div>
+    <h1>Как ты сегодня? 👋</h1>
+    <div class="mood-picker">${mb}</div>
+    <button class="btn btn-primary" onclick="saveCurrentMood()">Зафиксировать</button>
+    
+    <!-- Компактная плашка связи с Маратом -->
+    <div style="margin-top:16px; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:20px;">🎓</span>
+            <span style="font-size:13px; font-weight:600; color:var(--text-main);">Есть вопрос?</span>
+        </div>
+        <a href="https://t.me/${TELEGRAM_USERNAME}" target="_blank" class="btn-telegram">
+            💬 Написать Марату
+        </a>
+    </div>
+
+    ${historyHtml}`;
+}
+
+window.setMood=(m)=>{cm=m;rms()};
+window.saveCurrentMood=()=>{
+    const now = Date.now();
+    ml.push({
+        date: new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}), 
+        mood: cm,
+        timestamp: now
+    });
+    // Фильтруем список, оставляя только записи за последние 7 дней
+    ml = ml.filter(item => !item.timestamp || (now - item.timestamp <= SEVEN_DAYS_MS));
+    svM();
+    rms();
+};
+
+function rcl(){
+    let qh='';QC.forEach(c=>qh+=`<div class="context-card" onclick="sqc('${c.id}')">${c.title}</div>`);
+    document.getElementById('app').innerHTML=`${renderTabs('cards')}
+    <h2>📚 Шпаргалки для общения</h2><div class="subhead">Алгоритмы самопомощи перед сложными контактами</div><div class="context-grid">${qh}</div>`;
+}
+
+window.sqc=(id)=>{
+    const c=QC.find(x=>x.id===id);
+    document.getElementById('app').innerHTML=`<span class="back-link" onclick="switchTab('cards')">← Назад к спискам</span>
+    <div class="coping-card">
+        <h2>${c.title}</h2>
+        <div class="coping-section" style="margin-top:16px;"><div class="coping-label">Контекст</div><div class="coping-content">${c.context}</div></div>
+        <div class="coping-section"><div class="coping-label">Ложная мысль</div><div class="coping-content">${c.thought}</div></div>
+        <div class="coping-section"><div class="coping-label">Рациональный ответ</div><div class="coping-content">${c.rational}</div></div>
+        <div class="coping-section"><div class="coping-label">⚡ Быстрое действие</div><div class="coping-content">${c.action}</div></div>
+    </div>`;
+}
+
+function rmindful(){
+    let mh='';MC.forEach(c=>mh+=`<div class="context-card" onclick="smc('${c.id}')">${c.title}</div>`);
+    document.getElementById('app').innerHTML=`${renderTabs('mindful')}
+    <h2>🧘 Покой и заземление</h2><div class="subhead">Снятие телесного напряжения перед разговором</div><div class="context-grid">${mh}</div>`;
+}
+
+window.smc=(id)=>{
+    const c=MC.find(x=>x.id===id);
+    let extra=c.type==='timer'?'<div class="breath-circle">Дыши</div>':'';
+    document.getElementById('app').innerHTML=`<span class="back-link" onclick="switchTab('mindful')">← Назад</span>
+    <div class="coping-card"><h2>${c.title}</h2><div class="subhead">${c.context}</div>${extra}<div class="coping-content">${c.action}</div></div>`;
+};
+
+function rts(){
+    document.getElementById('app').innerHTML=`${renderTabs('test')}
+    <h2>📋 Экспресс-диагностика</h2>
+    <div class="subhead">Узнай, насколько сильно цифровая изоляция заблокировала твои навыки общения.</div>
+    <button class="btn btn-primary" onclick="startTest()">🚀 Начать тест (1 мин)</button>`;
+}
+
+window.startTest=()=>{cq=0;an=[];rq()};
+
+function rq(){
+    if(cq>=TQ.length){clr();return}
+    const q=TQ[cq];const p=(cq/TQ.length)*100;let o='';
+    q.options.forEach((opt,i)=>o+=`<div class="test-option ${an[cq]===i?'selected':''}" onclick="so(${i})">${opt}</div>`);
+    document.getElementById('app').innerHTML=`<div class="progress-bar"><div class="progress-fill" style="width:${p}%;"></div></div>
+    <div class="test-question">${q.text}</div><div class="test-options">${o}</div>
+    <button class="btn btn-primary" onclick="nq()" ${an[cq]===undefined?'disabled style="opacity:0.4;"':''}>${cq===TQ.length-1?'Завершить':'Дальше'}</button>`;
+}
+
+window.so=(i)=>{an[cq]=i;rq()};
+window.nq=()=>{cq++;rq()};
+
+function clr(){
+    let total=0; an.forEach(v=>total+=v);
+    const max = TQ.length * 3;
+    const percent = Math.round((total/max)*100);
+    
+    let level = 'Низкий';
+    let text = 'Ты довольно свободно чувствуешь себя в живом контакте, зажимы минимальны.';
+    if(percent > 40 && percent <= 70) {
+        level = 'Умеренный';
+        text = 'Есть фоновый страх показаться глупым или навязчивым. Мозг включил режим защиты.';
+    } else if(percent > 70) {
+        level = 'Высокий';
+        text = 'Цифровая изоляция и страх отвержения сильно блокируют твои социальные навыки. Пора это менять.';
+    }
+    
+    tr.push({ date: new Date().toLocaleDateString('ru-RU'), score: percent, level: level });
+    svT();
+    
+    document.getElementById('app').innerHTML=`
+    <h2>📊 Твой результат</h2>
+    <div class="coping-card">
+        <div class="coping-label">Уровень социального барьера</div>
+        <div style="font-size:24px; font-weight:700; color:var(--accent-primary); margin:8px 0;">${level} (${percent}%)</div>
+        <div class="coping-content">${text}</div>
+    </div>
+    
+    <div style="margin-top:20px; text-align:center;">
+        <p style="font-size:14px; color:var(--text-sub); margin-bottom:12px;">Хочешь убрать этот зажим и научиться общаться свободно?</p>
+        <a href="https://t.me/${TELEGRAM_USERNAME}" target="_blank" class="btn-telegram" style="display:flex; padding:14px;">
+            <span>💬 Обсудить результат с Маратом</span>
+        </a>
+    </div>
+    
+    <button class="btn btn-outline" style="margin-top:16px;" onclick="switchTab('main')">Вернуться на главную</button>`;
+}
+
+// Офлайн-кэш для запуска PWA
+if ('serviceWorker' in navigator) {
+    const swCode = `
+        const CACHE_NAME = 'kpt-app-v6';
+        self.addEventListener('install', (e) => { self.skipWaiting(); });
+        self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+        self.addEventListener('fetch', (e) => {
+            e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
+        });
+    `;
+    const blob = new Blob([swCode], { type: 'text/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+
+ra();
+</script>
+</body>
+</html>
